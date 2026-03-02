@@ -1,0 +1,193 @@
+{
+  "name": "backend-in-deployment → create-devops-to-do-task",
+  "nodes": [
+    {
+      "parameters": {
+        "team": "90181787093",
+        "events": [
+          "taskStatusUpdated"
+        ],
+        "filters": {
+          "listId": "901811840900",
+          "spaceId": "90186999301"
+        }
+      },
+      "type": "n8n-nodes-base.clickUpTrigger",
+      "typeVersion": 1,
+      "position": [
+        368,
+        240
+      ],
+      "id": "42fcb8ea-341c-411f-858d-b695e9a3bd94",
+      "name": "ClickUp Trigger",
+      "webhookId": "c8c1df17-fb49-4572-9f41-99983b7e64ec",
+      "credentials": {
+        "clickUpApi": {
+          "id": "FGZ36444ame9ffAE",
+          "name": "ClickUp account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "team": "90181787093",
+        "space": "90187174239",
+        "folderless": true,
+        "list": "901812001754",
+        "name": "={{ `[${$json.id}] ${$json.name}` }}",
+        "additionalFields": {
+          "status": "to do"
+        }
+      },
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        240
+      ],
+      "id": "e4167c62-0075-4be1-b6dc-01b2ae28fc45",
+      "name": "Create a task",
+      "credentials": {
+        "clickUpApi": {
+          "id": "FGZ36444ame9ffAE",
+          "name": "ClickUp account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        608,
+        240
+      ],
+      "id": "329ccf8d-8122-4b58-a6aa-e41a669b8f23",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "04424456-fcef-4386-9fb4-fef685ae4442",
+              "leftValue": "={{ $json.history_items[0].after.status }}",
+              "rightValue": "in deployment",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3636bd1b-75a4-44d2-82cd-0014e6a2a61a",
+              "leftValue": "={{ $json.history_items[0].after.status }}",
+              "rightValue": "IN DEPLOYMENT",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        816,
+        336
+      ],
+      "id": "efeee666-bc6a-4420-9392-e085a93fa4ac",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "id": "={{ $json.task_id }}"
+      },
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        240
+      ],
+      "id": "726ad782-b94b-4cbe-94cc-7ed36259d2be",
+      "name": "Get a task2",
+      "credentials": {
+        "clickUpApi": {
+          "id": "FGZ36444ame9ffAE",
+          "name": "ClickUp account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "ClickUp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Get a task2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a task2": {
+      "main": [
+        [
+          {
+            "node": "Create a task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7f469ac5-512b-4a79-8978-1135c2490904",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bfefda8b8561e999840c4adfac23e386ed9e4cb2425c2372729c1876c847c669"
+  },
+  "id": "gI3Ckgglh9g2op87",
+  "tags": []
+}
